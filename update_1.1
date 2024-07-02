@@ -1,0 +1,67 @@
+from pygame import *
+
+window = display.set_mode((700,500))
+window.fill((0,0,175))
+
+clock = time.Clock()
+
+class game_sprite(sprite.Sprite):
+    def __init__(self,x,y,width,height,speed,player_image):
+        sprite.Sprite.__init__(self)
+        self.image = transform.scale(image.load(player_image), (width,height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = speed
+    def blit(self):
+        window.blit(self.image,(self.rect.x,self.rect.y))
+
+class player(game_sprite):
+    def update_L(self):
+        keys_pressed = key.get_pressed()
+        if keys_pressed[K_s] and self.rect.y <= 410:
+            self.rect.y += self.speed
+        if keys_pressed[K_w] and self.rect.y >= 20:
+            self.rect.y -= self.speed
+
+    def update_R(self):
+        keys_pressed = key.get_pressed()
+        if keys_pressed[K_DOWN] and self.rect.y <= 410:
+            self.rect.y += self.speed
+        if keys_pressed[K_UP] and self.rect.y >= 20:
+            self.rect.y -= self.speed
+
+class ball(game_sprite):
+    def update(self):
+        self.rect.x += self.speed
+        self.rect.y += self.speed
+        if self.rect.y >= 450:
+            self.speed *= -1
+        if self.rect.y <= 50:
+            self.speed *= -1
+        if self.rect.x >= 650:
+            finish == True
+        if self.rect.x <= 50:
+            finish == True
+
+platform_l = player(70,150,20,100,10,'platform.png')
+platform_r = player(630,250,20,100,10,'platform.png')
+ball_sprite = ball(320,220,30,30,20,'ball.png')
+
+finish = False
+game = True
+while game:
+
+
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
+
+    platform_l.blit()
+    platform_r.blit()
+    platform_l.update_L()
+    platform_r.update_R()
+    ball_sprite.blit()
+
+    display.update()
+    time.delay(60)
