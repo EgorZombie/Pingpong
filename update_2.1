@@ -1,0 +1,82 @@
+from pygame import *
+
+window = display.set_mode((700,500))
+
+clock = time.Clock()
+
+font.init()
+
+class game_sprite(sprite.Sprite):
+    def __init__(self,x,y,width,height,speed,player_image):
+        sprite.Sprite.__init__(self)
+        self.image = transform.scale(image.load(player_image), (width,height))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = speed
+    def blit(self):
+        window.blit(self.image,(self.rect.x,self.rect.y))
+
+class player(game_sprite):
+    def update_L(self):
+        keys_pressed = key.get_pressed()
+        if keys_pressed[K_s] and self.rect.y <= 410:
+            self.rect.y += self.speed
+        if keys_pressed[K_w] and self.rect.y >= 20:
+            self.rect.y -= self.speed
+
+    def update_R(self):
+        keys_pressed = key.get_pressed()
+        if keys_pressed[K_DOWN] and self.rect.y <= 410:
+            self.rect.y += self.speed
+        if keys_pressed[K_UP] and self.rect.y >= 20:
+            self.rect.y -= self.speed
+
+platform_l = player(70,150,20,100,10,'platform.png')
+platform_r = player(630,250,20,100,10,'platform.png')
+ball_sprite = game_sprite(320,220,30,30,20,'ball.png')
+
+font = font.Font(None,50)
+
+speed_x = 10
+speed_y = 10
+l_win = font.render('ИГРОК СЛЕВА ПОБЕДИЛ!',True,(0,255,0))
+r_win = font.render('ИГРОК СПРАВА ПОБЕДИЛ!',True,(0,255,0))
+
+finish = False
+game = True
+while game:
+
+    window.fill((0,0,175))
+
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
+
+    if ball_sprite.rect.x <= 0:
+        finish = True
+        window.blit(l_win,(120,200))
+    if ball_sprite.rect.x >= 700:
+        finish = True
+        window.blit(r_win,(120,200))
+
+    if finish != True:
+        ball_sprite.rect.x += speed_x
+        ball_sprite.rect.y += speed_y
+
+        if ball_sprite.rect.y >= 500 or ball_sprite.rect.y <= 0:
+            speed_y *= -1
+
+        ball_sprite.blit()
+
+        if sprite.collide_rect(platform_l,ball_sprite) or sprite.collide_rect(platform_r,ball_sprite):
+            speed_x *= -1
+
+        platform_l.update_L()
+        platform_r.update_R()
+
+    platform_l.blit()
+    platform_r.blit()
+
+    display.update()
+    time.delay(60)
